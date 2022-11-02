@@ -28,6 +28,7 @@ async function dbConnect() {
         console.log(error.name, error.message)
     }
 }
+dbConnect()
 
 // Database Collection
 const Services = client.db('geniusCarDb').collection('services')
@@ -178,9 +179,6 @@ app.delete('/api/genius-car/order/:orderId', async (req, res) => {
 })
 
 
-
-
-dbConnect()
 app.listen(port, () => {
     console.log(`Genius Car Server Running on Port ${port}`)
 })
