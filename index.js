@@ -40,7 +40,7 @@ app.get('/api/genius-car/services', async (req, res) => {
         const services = await cursor.toArray()
         res.send({
             success: true,
-            message: 'Successfully got the data',
+            message: 'Successfully got the all services data',
             data: services
         })
     } catch (error) {
@@ -60,7 +60,7 @@ app.get('/api/genius-car/service/:serviceDetailId', async (req, res) => {
         const services = await Services.findOne(query)
         res.send({
             success: true,
-            message: 'Successfully got the data',
+            message: 'Successfully got the each service data with services id',
             data: services
         })
     } catch (error) {
@@ -96,6 +96,58 @@ app.post('/api/genius-car/orders', async (req, res) => {
         }) 
     }
 
+})
+
+// Order Display Api 
+app.get('/api/genius-car/orders', async (req, res) => {
+    try {
+        const cursor = Orders.find({})
+        const orders = await cursor.toArray()
+        res.send({
+            success: true,
+            message: 'Successfully got the Order data',
+            data: orders
+        })
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        })
+    }
+})
+
+// Display Order Status Update Api
+app.patch('/api/genius-car/order/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId
+        const status = req.body.status
+        const query = { _id: ObjectId(orderId) }
+        const updateOrder = {
+            $set: {
+                status: status
+            }
+        }
+
+        const orders = await Orders.updateOne(query, updateOrder)
+        if(orders.matchedCount) {
+            res.send({
+                success: true,
+                message: 'Successfully Status Updated'
+            })
+        }else {
+            res.send({
+                success: false,
+                error: "Couldn't update  the product"
+            })
+        }
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        })     
+    }
 })
 
 
