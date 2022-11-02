@@ -101,7 +101,13 @@ app.post('/api/genius-car/orders', async (req, res) => {
 // Order Display Api 
 app.get('/api/genius-car/orders', async (req, res) => {
     try {
-        const cursor = Orders.find({})
+        let query = {}
+        if(req.query.email) {
+            query = {
+                email: req.query.email
+            }
+        }
+        const cursor = Orders.find(query)
         const orders = await cursor.toArray()
         res.send({
             success: true,
