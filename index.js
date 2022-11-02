@@ -31,6 +31,7 @@ async function dbConnect() {
 
 // Database Collection
 const Services = client.db('geniusCarDb').collection('services')
+const Orders = client.db('geniusCarDb').collection('orders')
 
 // All Services Endpoint
 app.get('/api/genius-car/services', async (req, res) => {
@@ -70,6 +71,34 @@ app.get('/api/genius-car/service/:serviceDetailId', async (req, res) => {
         })     
     }
 })
+
+// Service Order Place Api
+app.post('/api/genius-car/orders', async (req, res) => {
+    try {
+        const orders = req.body
+        const order = await Orders.insertOne(orders)
+        if(order.insertedId) {
+            res.send({
+                success: true,
+                message: 'Order Successfully!'
+            })
+        }else{
+            res.send({
+                success: false,
+                error: "Couldn't Order!"
+            })
+        }
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        }) 
+    }
+
+})
+
+
 
 
 dbConnect()
