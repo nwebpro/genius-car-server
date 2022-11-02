@@ -156,6 +156,27 @@ app.patch('/api/genius-car/order/:orderId', async (req, res) => {
     }
 })
 
+// Order Delete Api
+app.delete('/api/genius-car/order/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId
+        const query = { _id: ObjectId(orderId) }
+        const deleteOrder = await Orders.deleteOne(query)
+        if(orders.deletedCount) {
+            res.send({
+                success: true,
+                message: 'Successfully deleted the order'
+            })
+        }
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        }) 
+    }
+})
+
 
 
 
