@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
 dotenv.config()
 import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb'
@@ -33,6 +34,48 @@ dbConnect()
 // Database Collection
 const Services = client.db('geniusCarDb').collection('services')
 const Orders = client.db('geniusCarDb').collection('orders')
+
+// Verify 2 step and 3rd step order display api JWT Token
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization
+    if(!authHeader) {
+        return res.status(401).send({
+            success: false,
+            message: 'Unauthorized Access!'
+        })
+    }
+    const token = authHeader.split(' ')[1]
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function(err, decoded) {
+        if(err) {
+            return res.status(403).send({
+                success: false,
+                message: 'Forbidden Access!'
+            })
+        }
+        req.decoded = decoded
+        next()
+    })
+
+}
+
+// JWT Token Api
+app.post('/api/genius-car/jwt', (req, res) => {
+    try {
+        const user = req.body
+        const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
+        res.send({
+            success: true,
+            message: 'Successfully JWT Token Generate!',
+            data: token
+        })
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        })
+    }
+})
 
 // All Services Endpoint
 app.get('/api/genius-car/services', async (req, res) => {
@@ -100,8 +143,17 @@ app.post('/api/genius-car/orders', async (req, res) => {
 })
 
 // Order Display Api 
-app.get('/api/genius-car/orders', async (req, res) => {
+app.get('/api/genius-car/orders', verifyJWT, async (req, res) => {
     try {
+        // Verify 3rd step JWT Token
+        const decoded = req.decoded
+        if(decoded.email !== req.query.email) {
+            res.status(403).send({
+                success: false,
+                message: 'Forbidden Access!'
+            })
+        }
+
         let query = {}
         if(req.query.email) {
             query = {
