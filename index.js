@@ -117,7 +117,7 @@ app.get('/api/genius-car/service/:serviceDetailId', async (req, res) => {
 })
 
 // Service Order Place Api
-app.post('/api/genius-car/orders', async (req, res) => {
+app.post('/api/genius-car/orders', verifyJWT, async (req, res) => {
     try {
         const orders = req.body
         const order = await Orders.insertOne(orders)
@@ -177,7 +177,7 @@ app.get('/api/genius-car/orders', verifyJWT, async (req, res) => {
 })
 
 // Display Order Status Update Api
-app.patch('/api/genius-car/order/:orderId', async (req, res) => {
+app.patch('/api/genius-car/order/:orderId', verifyJWT, async (req, res) => {
     try {
         const orderId = req.params.orderId
         const status = req.body.status
@@ -210,7 +210,7 @@ app.patch('/api/genius-car/order/:orderId', async (req, res) => {
 })
 
 // Order Delete Api
-app.delete('/api/genius-car/order/:orderId', async (req, res) => {
+app.delete('/api/genius-car/order/:orderId', verifyJWT, async (req, res) => {
     try {
         const orderId = req.params.orderId
         const query = { _id: ObjectId(orderId) }
